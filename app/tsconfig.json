@@ -1,0 +1,18 @@
+{
+    "version": "2.4.2",
+    "compilerOptions": {
+        "lib": ["es5", "es6", "esnext.asynciterable"],
+        "target": "es6",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "sourceMap": true
+    },
+    "include": ["src/**/*"],    
+    "exclude": [
+        "node_modules"
+    ]
+}
