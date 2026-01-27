@@ -1,11 +1,11 @@
 resource "aws_db_subnet_group" "db_subnet_group" {
-  name       = "db-subnet-group-${var.environment}"
+  name       = "db-subnet-group-xyz-${var.environment}"
   subnet_ids = var.subnet_ids
   tags = var.tags
 }
 
 resource "aws_security_group" "db_sg" {
-  name        = "db-sg-${var.environment}"
+  name        = "db-sg-xyz-${var.environment}"
   description = "Allow inbound traffic from EKS cluster."
   vpc_id      = var.vpc_id
   tags = var.tags
