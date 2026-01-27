@@ -1,70 +1,70 @@
-name: CI/CD Pipeline
+# name: CI/CD Pipeline
 
-on:
-  push:
-    branches:
-      - main
-      - develop
-      - 'feature/**'
+# on:
+#   push:
+#     branches:
+#       - main
+#       - develop
+#       - 'feature/**'
 
-env:
-  AWS_DEFAULT_REGION: us-east-1
-  ECR_REPOSITORY: example-app-dev
-  IMAGE_TAG: ${{ github.sha }}
+# env:
+#   AWS_DEFAULT_REGION: us-east-1
+#   ECR_REPOSITORY: example-app-dev
+#   IMAGE_TAG: ${{ github.sha }}
 
-jobs:
-  build_and_test:
-    runs-on: ubuntu-latest
-    environment: dev    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+# jobs:
+#   build_and_test:
+#     runs-on: ubuntu-latest
+#     environment: dev    
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ env.AWS_DEFAULT_REGION }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+#       - name: Login to Amazon ECR
+#         id: login-ecr
+#         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Check for ECR repository existence
-        id: check-ecr
-        run: |
-          if aws ecr describe-repositories --repository-names ${{ env.ECR_REPOSITORY }} > /dev/null 2>&1; then
-            echo "repo-found=true" >> $GITHUB_OUTPUT
-          else
-            echo "repo-found=false" >> $GITHUB_OUTPUT
-          fi
+#       - name: Check for ECR repository existence
+#         id: check-ecr
+#         run: |
+#           if aws ecr describe-repositories --repository-names ${{ env.ECR_REPOSITORY }} > /dev/null 2>&1; then
+#             echo "repo-found=true" >> $GITHUB_OUTPUT
+#           else
+#             echo "repo-found=false" >> $GITHUB_OUTPUT
+#           fi
 
-      - name: Build Docker image
-        run: docker build -t ${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} ./app
+#       - name: Build Docker image
+#         run: docker build -t ${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} ./app
 
-      - name: Push image to ECR
-        if: steps.check-ecr.outputs.repo-found == 'true'
-        run: |
-          docker tag ${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
-          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+#       - name: Push image to ECR
+#         if: steps.check-ecr.outputs.repo-found == 'true'
+#         run: |
+#           docker tag ${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+#           docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
 
-  deploy:
-    runs-on: ubuntu-latest
-    environment: dev
-    needs: build_and_test
-    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+#   deploy:
+#     runs-on: ubuntu-latest
+#     environment: dev
+#     needs: build_and_test
+#     if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
     
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ env.AWS_DEFAULT_REGION }}
 
-      - name: Update kubeconfig
-        run: aws eks update-kubeconfig --name example-app-dev --region ${{ env.AWS_DEFAULT_REGION }}
+#       - name: Update kubeconfig
+#         run: aws eks update-kubeconfig --name example-app-dev --region ${{ env.AWS_DEFAULT_REGION }}
