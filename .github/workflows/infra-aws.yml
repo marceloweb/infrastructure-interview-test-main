@@ -10,6 +10,7 @@ on:
         default: "dev"
         options:
           - "dev"
+          - "hml"
           - "prd"
       action:
         description: "Ação do Terraform"

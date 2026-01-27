@@ -6,16 +6,19 @@ on:
       - main
       - develop
       - 'feature/**'
+      - 'release/**'
 
 env:
   AWS_DEFAULT_REGION: us-east-1
-  ECR_REPOSITORY: example-app-${{ github.event.inputs.environment }}
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
-    environment: dev    
+    environment: ${{ github.event.inputs.environment }}   
+
+    env: 
+      ECR_REPOSITORY: example-app-${{ github.event.inputs.environment }} 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
