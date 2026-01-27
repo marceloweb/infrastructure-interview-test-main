@@ -14,11 +14,12 @@ env:
 
 jobs:
   build_and_test:
+    name: "CI/CD ${{ github.event.inputs.action }}"
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}   
+    environment: ${{ github.ref == 'refs/heads/main' && 'hml' || (startsWith(github.ref, 'refs/heads/release/') && 'prd' || 'dev') }}  
 
     env: 
-      ECR_REPOSITORY: example-app-${{ github.event.inputs.environment }} 
+      ECR_REPOSITORY: example-app-${{ github.ref == 'refs/heads/main' && 'hml' || (startsWith(github.ref, 'refs/heads/release/') && 'prd' || 'dev') }}  
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
