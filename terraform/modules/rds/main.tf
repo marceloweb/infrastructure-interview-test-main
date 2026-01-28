@@ -13,12 +13,22 @@ resource "aws_security_group" "db_sg" {
 
 resource "aws_security_group_rule" "db_ingress" {
   type                     = "ingress"
-  from_port                = 5432
-  to_port                  = 5432
+  from_port                = 3306
+  to_port                  = 3306
   protocol                 = "tcp"
   security_group_id        = aws_security_group.db_sg.id
   source_security_group_id = var.eks_cluster_security_group_id
   description              = "Allow traffic from EKS cluster."
+}
+
+resource "aws_security_group_rule" "db_egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  security_group_id = aws_security_group.db_sg.id
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow all outbound traffic"
 }
 
 resource "aws_db_instance" "mariadb" {
