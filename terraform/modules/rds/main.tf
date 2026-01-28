@@ -63,9 +63,4 @@ resource "null_resource" "db_setup" {
       MYSQL_PWD = var.db_password
     }
   }
-
-  provisioner "local-exec" {
-    when    = destroy
-    command = "echo 'Database cleanup if needed'"
-  }
 }
